@@ -1,0 +1,26 @@
+name: Manual Deployment Workflow
+
+on:
+ workflow_dispatch:
+   inputs:
+     environments:
+       description: "Select the Deployment Workflow"
+       required: true
+       default: dev
+       type: choice
+       options:
+         - dev
+         - staging
+         - prod
+ 
+# 5. Implements environment-based deployment logic
+
+jobs:
+  deploy:
+    name: Excute Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Deployment Status
+        run: |
+          echo "Deploying to ${{ github.event.inputs.environment }}"
+
