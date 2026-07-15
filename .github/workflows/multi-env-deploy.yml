@@ -3,7 +3,7 @@ name: Manual Deployment Workflow
 on:
  workflow_dispatch:
    inputs:
-     environments:
+     environment:
        description: "Select the Deployment Workflow"
        required: true
        default: dev
