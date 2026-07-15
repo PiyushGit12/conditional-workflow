@@ -1,0 +1,58 @@
+name: Parameterized Manual Workflow
+
+# 4. Configures workflow_dispatch with required inputs
+on:
+  workflow_dispatch:
+    inputs:
+      application_name:
+        description: 'Name of the application'
+        type: string
+        required: true
+      run_validation:
+        description: 'Should validation run?'
+        type: boolean
+        required: true
+        default: true
+
+jobs:
+  # 5. Implements the validate Job
+  validate:
+    name: Validate Application
+    runs-on: ubuntu-latest
+    # Map the step output to a job-level output so other jobs can see it
+    outputs:
+      validation_status: ${{ steps.determine_status.outputs.validation_status }}
+    
+    steps:
+      - name: Print Runtime Inputs
+        run: |
+          echo "Application Name: ${{ github.event.inputs.application_name }}"
+          echo "Run Validation: ${{ github.event.inputs.run_validation }}"
+
+      - name: Determine Validation Status
+        id: determine_status
+        run: |
+          # Check the boolean input and set the step output accordingly
+          if [ "${{ github.event.inputs.run_validation }}" = "true" ]; then
+            echo "validation_status=success" >> $GITHUB_OUTPUT
+            echo "Validation completed successfully."
+          else
+            echo "validation_status=skipped" >> $GITHUB_OUTPUT
+            echo "Validation skipped by user request."
+          fi
+
+  # 6. Implements the summary Job
+  summary:
+    name: Execution Summary
+    runs-on: ubuntu-latest
+    # Sets job dependency
+    needs: validate
+    # Conditionally execute only if validation_status is 'success'
+    if: ${{ needs.validate.outputs.validation_status == 'success' }}
+    
+    steps:
+      - name: Print Final Summary
+        run: |
+          echo "Successfully processed deployment validation for ${{ github.event.inputs.application_name }}."
+          echo "All validation gates passed."
+
