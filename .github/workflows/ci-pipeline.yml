@@ -1,0 +1,24 @@
+name: CI Pipeline
+
+on:
+ push:
+   branches:
+     - main
+     - develop
+ pull_request:
+   branches:
+     - main
+     - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repositories
+        uses: actions/checkout@v3
+
+      - name: Run Ci Pipeline
+        run: |
+          echo "CI Pipeline executed successfully!"
+          echo "Branch Name: ${{ github.ref }}"          
+
